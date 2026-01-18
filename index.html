@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>流体シミュレーション - Fluid Simulation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>流体シミュレーション</h1>
+        <div class="info">
+            <p>マウスをドラッグして流体を動かしてください</p>
+            <p>Drag your mouse to interact with the fluid</p>
+        </div>
+        <div class="controls">
+            <button id="clearBtn">クリア / Clear</button>
+            <label>
+                粘性 / Viscosity:
+                <input type="range" id="viscosity" min="0" max="100" value="20" step="1">
+                <span id="viscosityValue">20</span>
+            </label>
+            <label>
+                拡散率 / Diffusion:
+                <input type="range" id="diffusion" min="0" max="100" value="10" step="1">
+                <span id="diffusionValue">10</span>
+            </label>
+        </div>
+        <canvas id="fluidCanvas"></canvas>
+    </div>
+    <script src="fluid.js"></script>
+</body>
+</html>
