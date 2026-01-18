@@ -9,6 +9,8 @@ class FluidSimulation {
         this.diff = 0.0001; // Diffusion rate
         this.visc = 0.0001; // Viscosity
         this.solverIterations = 20; // Number of iterations for linear solver
+        this.velocityMultiplier = 10; // Multiplier for mouse velocity input
+        this.densityFade = 0.99; // Density fade rate per frame (0-1)
         
         // Velocity fields
         this.u = new Array(this.size).fill(0);
@@ -53,8 +55,8 @@ class FluidSimulation {
             const mouseX = ((e.clientX - rect.left) / rect.width) * this.N;
             const mouseY = ((e.clientY - rect.top) / rect.height) * this.N;
             
-            const dx = (mouseX - this.mouseState.prevX) * 10;
-            const dy = (mouseY - this.mouseState.prevY) * 10;
+            const dx = (mouseX - this.mouseState.prevX) * this.velocityMultiplier;
+            const dy = (mouseY - this.mouseState.prevY) * this.velocityMultiplier;
             
             this.addVelocity(Math.floor(mouseX), Math.floor(mouseY), dx, dy);
             this.addDensity(Math.floor(mouseX), Math.floor(mouseY), 100);
@@ -90,8 +92,8 @@ class FluidSimulation {
             const mouseX = ((touch.clientX - rect.left) / rect.width) * this.N;
             const mouseY = ((touch.clientY - rect.top) / rect.height) * this.N;
             
-            const dx = (mouseX - this.mouseState.prevX) * 10;
-            const dy = (mouseY - this.mouseState.prevY) * 10;
+            const dx = (mouseX - this.mouseState.prevX) * this.velocityMultiplier;
+            const dy = (mouseY - this.mouseState.prevY) * this.velocityMultiplier;
             
             this.addVelocity(Math.floor(mouseX), Math.floor(mouseY), dx, dy);
             this.addDensity(Math.floor(mouseX), Math.floor(mouseY), 100);
@@ -224,7 +226,7 @@ class FluidSimulation {
         
         // Fade density over time
         for (let i = 0; i < this.size; i++) {
-            this.dens[i] *= 0.99;
+            this.dens[i] *= this.densityFade;
         }
     }
     
