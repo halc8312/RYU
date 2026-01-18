@@ -8,6 +8,7 @@ class FluidSimulation {
         this.dt = 0.1; // Time step
         this.diff = 0.0001; // Diffusion rate
         this.visc = 0.0001; // Viscosity
+        this.solverIterations = 20; // Number of iterations for linear solver
         
         // Velocity fields
         this.u = new Array(this.size).fill(0);
@@ -31,74 +32,77 @@ class FluidSimulation {
     }
     
     setupMouseInteraction() {
-        let isMouseDown = false;
-        let prevMouseX = 0;
-        let prevMouseY = 0;
+        // Mouse state encapsulated to avoid potential race conditions
+        this.mouseState = {
+            isDown: false,
+            prevX: 0,
+            prevY: 0
+        };
         
         this.canvas.addEventListener('mousedown', (e) => {
-            isMouseDown = true;
+            this.mouseState.isDown = true;
             const rect = this.canvas.getBoundingClientRect();
-            prevMouseX = ((e.clientX - rect.left) / rect.width) * this.N;
-            prevMouseY = ((e.clientY - rect.top) / rect.height) * this.N;
+            this.mouseState.prevX = ((e.clientX - rect.left) / rect.width) * this.N;
+            this.mouseState.prevY = ((e.clientY - rect.top) / rect.height) * this.N;
         });
         
         this.canvas.addEventListener('mousemove', (e) => {
-            if (!isMouseDown) return;
+            if (!this.mouseState.isDown) return;
             
             const rect = this.canvas.getBoundingClientRect();
             const mouseX = ((e.clientX - rect.left) / rect.width) * this.N;
             const mouseY = ((e.clientY - rect.top) / rect.height) * this.N;
             
-            const dx = (mouseX - prevMouseX) * 10;
-            const dy = (mouseY - prevMouseY) * 10;
+            const dx = (mouseX - this.mouseState.prevX) * 10;
+            const dy = (mouseY - this.mouseState.prevY) * 10;
             
             this.addVelocity(Math.floor(mouseX), Math.floor(mouseY), dx, dy);
             this.addDensity(Math.floor(mouseX), Math.floor(mouseY), 100);
             
-            prevMouseX = mouseX;
-            prevMouseY = mouseY;
+            this.mouseState.prevX = mouseX;
+            this.mouseState.prevY = mouseY;
         });
         
         this.canvas.addEventListener('mouseup', () => {
-            isMouseDown = false;
+            this.mouseState.isDown = false;
         });
         
         this.canvas.addEventListener('mouseleave', () => {
-            isMouseDown = false;
+            this.mouseState.isDown = false;
         });
         
-        // Touch support for mobile
+        // Touch support for Mobile
         this.canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            isMouseDown = true;
+            this.mouseState.isDown = true;
             const rect = this.canvas.getBoundingClientRect();
             const touch = e.touches[0];
-            prevMouseX = ((touch.clientX - rect.left) / rect.width) * this.N;
-            prevMouseY = ((touch.clientY - rect.top) / rect.height) * this.N;
+            this.mouseState.prevX = ((touch.clientX - rect.left) / rect.width) * this.N;
+            this.mouseState.prevY = ((touch.clientY - rect.top) / rect.height) * this.N;
         });
         
         this.canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
-            if (!isMouseDown) return;
+            if (!this.mouseState.isDown) return;
             
             const rect = this.canvas.getBoundingClientRect();
             const touch = e.touches[0];
             const mouseX = ((touch.clientX - rect.left) / rect.width) * this.N;
             const mouseY = ((touch.clientY - rect.top) / rect.height) * this.N;
             
-            const dx = (mouseX - prevMouseX) * 10;
-            const dy = (mouseY - prevMouseY) * 10;
+            const dx = (mouseX - this.mouseState.prevX) * 10;
+            const dy = (mouseY - this.mouseState.prevY) * 10;
             
             this.addVelocity(Math.floor(mouseX), Math.floor(mouseY), dx, dy);
             this.addDensity(Math.floor(mouseX), Math.floor(mouseY), 100);
             
-            prevMouseX = mouseX;
-            prevMouseY = mouseY;
+            this.mouseState.prevX = mouseX;
+            this.mouseState.prevY = mouseY;
         });
         
         this.canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
-            isMouseDown = false;
+            this.mouseState.isDown = false;
         });
     }
     
@@ -136,7 +140,7 @@ class FluidSimulation {
     linSolve(b, x, x0, a, c) {
         const N = this.N;
         
-        for (let k = 0; k < 20; k++) {
+        for (let k = 0; k < this.solverIterations; k++) {
             for (let i = 1; i <= N; i++) {
                 for (let j = 1; j <= N; j++) {
                     x[this.IX(i, j)] = (x0[this.IX(i, j)] + a * (
@@ -323,12 +327,14 @@ window.addEventListener('load', () => {
     viscositySlider.addEventListener('input', (e) => {
         const value = e.target.value;
         viscosityValue.textContent = value;
+        e.target.setAttribute('aria-valuenow', value);
         fluid.visc = value / 100000;
     });
     
     diffusionSlider.addEventListener('input', (e) => {
         const value = e.target.value;
         diffusionValue.textContent = value;
+        e.target.setAttribute('aria-valuenow', value);
         fluid.diff = value / 100000;
     });
     

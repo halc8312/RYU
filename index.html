@@ -15,15 +15,15 @@
         </div>
         <div class="controls">
             <button id="clearBtn">クリア / Clear</button>
-            <label>
+            <label for="viscosity">
                 粘性 / Viscosity:
-                <input type="range" id="viscosity" min="0" max="100" value="20" step="1">
-                <span id="viscosityValue">20</span>
+                <input type="range" id="viscosity" name="viscosity" min="0" max="100" value="20" step="1" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20">
+                <span id="viscosityValue" aria-live="polite">20</span>
             </label>
-            <label>
+            <label for="diffusion">
                 拡散率 / Diffusion:
-                <input type="range" id="diffusion" min="0" max="100" value="10" step="1">
-                <span id="diffusionValue">10</span>
+                <input type="range" id="diffusion" name="diffusion" min="0" max="100" value="10" step="1" aria-valuemin="0" aria-valuemax="100" aria-valuenow="10">
+                <span id="diffusionValue" aria-live="polite">10</span>
             </label>
         </div>
         <canvas id="fluidCanvas"></canvas>
