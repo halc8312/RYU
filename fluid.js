@@ -81,7 +81,7 @@ class FluidSimulation {
             const touch = e.touches[0];
             this.mouseState.prevX = ((touch.clientX - rect.left) / rect.width) * this.N;
             this.mouseState.prevY = ((touch.clientY - rect.top) / rect.height) * this.N;
-        });
+        }, { passive: false });
         
         this.canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
@@ -100,12 +100,12 @@ class FluidSimulation {
             
             this.mouseState.prevX = mouseX;
             this.mouseState.prevY = mouseY;
-        });
+        }, { passive: false });
         
         this.canvas.addEventListener('touchend', (e) => {
             e.preventDefault();
             this.mouseState.isDown = false;
-        });
+        }, { passive: false });
     }
     
     IX(i, j) {

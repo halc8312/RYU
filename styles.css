@@ -92,6 +92,7 @@ h1 {
     border-radius: 10px;
     cursor: crosshair;
     background: #000;
+    touch-action: none;
 }
 
 @media (max-width: 768px) {
